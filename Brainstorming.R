@@ -18,6 +18,7 @@ data_cname = file.path(".","Data_text")
 # make corpus
 data_docs = Corpus(DirSource(data_cname))
 
+data_docs
 
 # Question 3
 # Start Making Token
@@ -33,9 +34,9 @@ data_docs <- tm_map(data_docs, juneremoveChars, "’s")
 data_docs <- tm_map(data_docs, juneremoveChars, "’ve")
 data_docs <- tm_map(data_docs, juneremoveChars, "’d")
 data_docs <- tm_map(data_docs, juneremoveChars, "’m")
-data_docs <- tm_map(data_docs, juneremoveChars, "doesn’t")
-data_docs <- tm_map(data_docs, juneremoveChars, "didn’t")
-data_docs <- tm_map(data_docs, juneremoveChars, "isn’t")
+data_docs <- tm_map(data_docs, juneremoveChars, "n't")
+# data_docs <- tm_map(data_docs, juneremoveChars, "didn’t")
+# data_docs <- tm_map(data_docs, juneremoveChars, "isn’t")
 data_docs <- tm_map(data_docs, juneremoveChars, "–")
 data_docs <- tm_map(data_docs, juneremoveChars, "“")
 data_docs <- tm_map(data_docs, juneremoveChars, "”")
@@ -55,28 +56,58 @@ data_dtm <- DocumentTermMatrix(data_docs)
 dim(data_dtm)
 
 # Remove sparse terms
-data_dtm <- removeSparseTerms(data_dtm, sparse = 0.45)
+# Remove columns with 60% empty (0) cells
+data_dtm <- removeSparseTerms(data_dtm, sparse = 0.5)
 
-write.csv(data_dtm, "data_dtm.csv")
+#write.csv(data_dtm, "data_dtm.csv")
 
 dim(data_dtm)
 
 # Question 4
 
-findFreqTerms(data_dtm,lowfreq = 10)
+# Cosine distance between each document for clustering.
 dtms = as.matrix(data_dtm)
 distmatrix = proxy::dist(dtms, method = "cosine")
 fit = hclust(distmatrix, method = "ward.D")
 plot(fit, hang = -1, main = "Question 4, Clustering Dendrogram")
 
-inspect(data_dtm)
+#inspect(data_dtm)
 
-# • Use the cosine distance between each document for clustering.
-# • Identify which cluster each document belongs to.
-# • Calculate the accuracy with which the clustering groups documents by topic.
-# • Give a qualitative description of the quality of the clustering. (4 Marks)
+fit <- hclust(distmatrix, method = "ward.D")
+
+fit
+
+# using cluster object "fit" create required number of clusters.
+cutfit <- cutree(fit, k = 3)
 
 
+# Calculate the accuracy with which the clustering groups documents by topic.
 
-# Question 5
+# Create vector of topic labels in same order as corpus
+topics = c("food", "food", "food","food","food",
+           "tech", "tech", "tech", "tech", "tech",
+           "world", "world", "world", "world", "world")
+
+
+groups = cutree(fit, k = 3)
+
+cluster_table <- table(GroupNames = topics, Clusters = groups)
+
+TA =  as.data.frame.matrix(table(GroupNames = topics, Clusters = groups))
+
+TA = TA[,c(2,1,3)]
+
+TA_matrix <- as.matrix(TA)
+
+diag_TA <- diag(TA_matrix)
+
+accuracy <- sum(diag_TA) / sum(TA_matrix)
+
+accuracy
+
+
+# • Give a qualitative description of the quality of the clustering. 
+
+
+# Question 
 
