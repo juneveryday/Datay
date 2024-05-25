@@ -6,6 +6,7 @@ library(slam)
 library(tm)
 library(SnowballC)
 library(proxy)
+library(igraph)
 
 # text file path checking
 data_cname = file.path(".","Data_text")
@@ -97,6 +98,8 @@ TA =  as.data.frame.matrix(table(GroupNames = topics, Clusters = groups))
 
 TA = TA[,c(2,1,3)]
 
+TA
+
 TA_matrix <- as.matrix(TA)
 
 diag_TA <- diag(TA_matrix)
@@ -105,9 +108,47 @@ accuracy <- sum(diag_TA) / sum(TA_matrix)
 
 accuracy
 
+# Question 5
+ 
+# convert to binary matrix
+dtmsx = as.matrix((dtms > 0) + 0)
 
-# • Give a qualitative description of the quality of the clustering. 
+# multiply binary matrix by its transpose
+ByAbsMatrix = dtmsx %*% t(dtmsx)
+
+# make leading diagonal zero
+diag(ByAbsMatrix) = 0
+
+#ByAbsMatrix
+
+# Create graph object
+Q5_SM_network = graph_from_adjacency_matrix(ByAbsMatrix, mode = "undirected", weighted = TRUE)
+
+# Plot the Basic model
+plot(Q5_SM_network,
+     main = "Q5 Single Basic Mode Network")
+
+# Get the weights
+Q5_SM_network_weight = E(Q5_SM_network)$weight
+
+# Create color palette function
+Q5_color_picker = colorRampPalette(c("lightpink","skyblue","grey"))
+
+# Generate edge colors based on weights
+Q5_edge_colors <- Q5_color_picker(length(Q5_SM_network_weight))[as.numeric(cut(Q5_SM_network_weight, breaks = length(Q5_SM_network_weight)))]
+
+# Plot the graph
+plot(Q5_SM_network,
+     edge.label = Q5_SM_network_weight,
+     edge.color = Q5_edge_colors,
+     edge.width = 1,
+     main = "Q5 Single Final Mode Network")
 
 
-# Question 
+
+
+
+
+
+
 
