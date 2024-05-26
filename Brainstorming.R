@@ -1,7 +1,7 @@
 # reset
 rm(list = ls())
 
-
+# bringing library
 library(slam)
 library(tm)
 library(SnowballC)
@@ -17,6 +17,7 @@ data_cname = file.path(".","Data_text")
 
 # Question 2
 # make corpus
+set.seed("31994695")
 data_docs = Corpus(DirSource(data_cname))
 
 data_docs
@@ -56,6 +57,7 @@ data_docs<- tm_map(data_docs, stemDocument, language = "english")
 
 
 # Create document term matrix
+set.seed("31994695")
 data_dtm <- DocumentTermMatrix(data_docs) 
 
 dim(data_dtm)
@@ -71,6 +73,7 @@ dim(data_dtm)
 # Question 4
 
 # Cosine distance between each document for clustering.
+set.seed("31994695")
 dtms = as.matrix(data_dtm)
 distmatrix = proxy::dist(dtms, method = "cosine")
 fit = hclust(distmatrix, method = "ward.D")
@@ -126,9 +129,11 @@ diag(ByAbsMatrix) = 0
 # ByAbsMatrix
 
 # Create graph object
+set.seed("31994695")
 Q5_SM_network = graph_from_adjacency_matrix(ByAbsMatrix, mode = "undirected", weighted = TRUE)
 
 # Plot the Basic model
+set.seed("31994695")
 plot(Q5_SM_network,
      main = "Q5 Single Basic Mode Network")
 
@@ -136,11 +141,13 @@ plot(Q5_SM_network,
 Q5_SM_network_weight = E(Q5_SM_network)$weight
 
 # Create color palette function
-color_picker = colorRampPalette(c("lightpink","skyblue","grey"))
+color_picker = colorRampPalette(c("pink","lightblue","green"))
 
 # Generate edge colors based on weights
-Q5_edge_colors <- Q5_color_picker(length(Q5_SM_network_weight))[as.numeric(cut(Q5_SM_network_weight, breaks = length(Q5_SM_network_weight)))]
+Q5_edge_colors <- color_picker(length(Q5_SM_network_weight))[as.numeric(cut(Q5_SM_network_weight, breaks = length(Q5_SM_network_weight)))]
 
+
+set.seed("31994695")
 # Plot the graph
 plot(Q5_SM_network,
      edge.label = Q5_SM_network_weight,
@@ -150,27 +157,28 @@ plot(Q5_SM_network,
 
 
 # Question 6
+set.seed("31994695")
 ByTokenMatrix = t(dtmsx) %*% dtmsx
 
 # make leading diagonal zero
 diag(ByTokenMatrix) = 0
 
 # Create graph object
+set.seed("31994695")
 Q6_TK_network = graph_from_adjacency_matrix(ByTokenMatrix, mode = "undirected", weighted = TRUE)
 
 # plot the basic model
+set.seed("31994695")
 plot(Q6_TK_network,
      main = "Q6 Single Basic Mode Network")
 
 # Get the weights
 Q6_TK_network_weight = E(Q6_TK_network)$weight
 
-# Create color palette function
-color_picker = colorRampPalette(c("lightpink","skyblue","grey"))
-
-
 # Generate edge colors based on weights
 Q6_edge_colors <- color_picker(length(Q6_TK_network_weight))[as.numeric(cut(Q6_TK_network_weight, breaks = length(Q6_TK_network_weight)))]
+
+set.seed("31994695")
 
 # Plot the graph
 plot(Q6_TK_network,
@@ -203,13 +211,15 @@ g <- graph.data.frame(dtmsc, directed = FALSE)
 
 bipartite.mapping(g)
 
+g
+set.seed("31994695")
 V(g)$type <- bipartite_mapping(g)$type
 V(g)$color <- ifelse(V(g)$type, "lightgreen","pink")
 V(g)$shape <- ifelse(V(g)$type, "circle", "square")
 E(g)$color <- "lightgrey"
 
 # plot the basic Bipartite network plot
-plot(g)
+#plot(g)
 
 # Get the weights
 Q7_BP_network_weight = E(g)$weight
@@ -217,13 +227,13 @@ Q7_BP_network_weight = E(g)$weight
 # change to numeric
 Q7_BP_network_weight <- as.numeric(Q7_BP_network_weight)
 
-# Create color palette function
-color_picker = colorRampPalette(c("lightpink","skyblue","grey"))
-
+set.seed("31994695")
 # Generate edge colors based on weights
 Q7_edge_colors <- color_picker(length(Q7_BP_network_weight))[as.numeric(cut(Q7_BP_network_weight, breaks = length(Q7_BP_network_weight)))]
 
+
 # Plot the graph
+set.seed("31994695")
 plot(g,
      edge.label = Q7_BP_network_weight,
      edge.color = Q7_edge_colors,
