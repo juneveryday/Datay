@@ -36,8 +36,12 @@ data_docs <- tm_map(data_docs, juneremoveChars, "’ve")
 data_docs <- tm_map(data_docs, juneremoveChars, "’d")
 data_docs <- tm_map(data_docs, juneremoveChars, "’m")
 data_docs <- tm_map(data_docs, juneremoveChars, "n't")
-# data_docs <- tm_map(data_docs, juneremoveChars, "didn’t")
-# data_docs <- tm_map(data_docs, juneremoveChars, "isn’t")
+data_docs <- tm_map(data_docs, juneremoveChars, "like")
+data_docs <- tm_map(data_docs, juneremoveChars, "can")
+data_docs <- tm_map(data_docs, juneremoveChars, "take")
+data_docs <- tm_map(data_docs, juneremoveChars, "also")
+data_docs <- tm_map(data_docs, juneremoveChars, "one")
+data_docs <- tm_map(data_docs, juneremoveChars, "year")
 data_docs <- tm_map(data_docs, juneremoveChars, "–")
 data_docs <- tm_map(data_docs, juneremoveChars, "“")
 data_docs <- tm_map(data_docs, juneremoveChars, "”")
@@ -119,7 +123,7 @@ ByAbsMatrix = dtmsx %*% t(dtmsx)
 # make leading diagonal zero
 diag(ByAbsMatrix) = 0
 
-#ByAbsMatrix
+# ByAbsMatrix
 
 # Create graph object
 Q5_SM_network = graph_from_adjacency_matrix(ByAbsMatrix, mode = "undirected", weighted = TRUE)
@@ -132,7 +136,7 @@ plot(Q5_SM_network,
 Q5_SM_network_weight = E(Q5_SM_network)$weight
 
 # Create color palette function
-Q5_color_picker = colorRampPalette(c("lightpink","skyblue","grey"))
+color_picker = colorRampPalette(c("lightpink","skyblue","grey"))
 
 # Generate edge colors based on weights
 Q5_edge_colors <- Q5_color_picker(length(Q5_SM_network_weight))[as.numeric(cut(Q5_SM_network_weight, breaks = length(Q5_SM_network_weight)))]
@@ -145,10 +149,84 @@ plot(Q5_SM_network,
      main = "Q5 Single Final Mode Network")
 
 
+# Question 6
+ByTokenMatrix = t(dtmsx) %*% dtmsx
+
+# make leading diagonal zero
+diag(ByTokenMatrix) = 0
+
+# Create graph object
+Q6_TK_network = graph_from_adjacency_matrix(ByTokenMatrix, mode = "undirected", weighted = TRUE)
+
+# plot the basic model
+plot(Q6_TK_network,
+     main = "Q6 Single Basic Mode Network")
+
+# Get the weights
+Q6_TK_network_weight = E(Q6_TK_network)$weight
+
+# Create color palette function
+color_picker = colorRampPalette(c("lightpink","skyblue","grey"))
 
 
+# Generate edge colors based on weights
+Q6_edge_colors <- color_picker(length(Q6_TK_network_weight))[as.numeric(cut(Q6_TK_network_weight, breaks = length(Q6_TK_network_weight)))]
 
+# Plot the graph
+plot(Q6_TK_network,
+     edge.label = Q6_TK_network_weight,
+     edge.color = Q6_edge_colors,
+     edge.width = 1,
+     main = "Q6 Token Final Mode Network")
 
+# Question 7
+# start with documnet term matrix dtms
+dtmsa = as.data.frame(dtms) # clone dtms
 
+dtmsa$ABS = rownames(dtmsa) # add row names
 
+dtmsb = data.frame()
+for (i in 1:nrow(dtmsa)){
+  for (j in 1:(ncol(dtmsa) - 1)){
+    touse = cbind(dtmsa[i,j], dtmsa[i,ncol(dtmsa)],colnames(dtmsa[j]))
+    dtmsb = rbind(dtmsb,touse)}} # close loops
+
+colnames(dtmsb) = c("weight", "abs", "token")    
+
+dtmsc = dtmsb[dtmsb$weight != 0,] #delete 0 weights
+
+# put columns in order : abs, token, weight
+dtmsc = dtmsc[,c(2,3,1)]
+
+# create graph object and declare bipartite
+g <- graph.data.frame(dtmsc, directed = FALSE)
+
+bipartite.mapping(g)
+
+V(g)$type <- bipartite_mapping(g)$type
+V(g)$color <- ifelse(V(g)$type, "lightgreen","pink")
+V(g)$shape <- ifelse(V(g)$type, "circle", "square")
+E(g)$color <- "lightgrey"
+
+# plot the basic Bipartite network plot
+plot(g)
+
+# Get the weights
+Q7_BP_network_weight = E(g)$weight
+
+# change to numeric
+Q7_BP_network_weight <- as.numeric(Q7_BP_network_weight)
+
+# Create color palette function
+color_picker = colorRampPalette(c("lightpink","skyblue","grey"))
+
+# Generate edge colors based on weights
+Q7_edge_colors <- color_picker(length(Q7_BP_network_weight))[as.numeric(cut(Q7_BP_network_weight, breaks = length(Q7_BP_network_weight)))]
+
+# Plot the graph
+plot(g,
+     edge.label = Q7_BP_network_weight,
+     edge.color = Q7_edge_colors,
+     edge.width = 1,
+     main = "Q7 Bipartite Final Mode Network")
 
